@@ -1,8 +1,8 @@
 package com.service.stprest.dao;
 
 import org.springframework.data.jpa.repository.JpaRepository;
-import com.service.stprest.entities.Stocks;
+import com.service.stprest.entities.Stock;
 
-public interface StockDao extends JpaRepository<Stocks,String> {
+public interface StockDao extends JpaRepository<Stock,String> {
 
 }

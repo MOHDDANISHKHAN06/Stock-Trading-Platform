@@ -8,24 +8,24 @@ import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import com.service.stprest.entities.Stocks;
-import com.service.stprest.services.StocksService;
+import com.service.stprest.entities.Stock;
+import com.service.stprest.helper.StockService;
 
 @RestController
 public class StockController {
 	
 	@Autowired
-	StocksService stockService;
+	StockService stockService;
 	
 	@GetMapping("/stocks")
-	public List<Stocks> getStocks(){
+	public List<Stock> getStocks(){
 		return this.stockService.getStocks();
 		
 		
 	}
 	
 	@PostMapping("/stocks")
-	public Stocks addStock(@RequestBody Stocks stock) {
+	public Stock addStock(@RequestBody Stock stock) {
 		return this.stockService.addStock(stock);
 		
 	}

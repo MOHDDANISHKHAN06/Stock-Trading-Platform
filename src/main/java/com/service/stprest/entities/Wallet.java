@@ -1,42 +1,58 @@
 package com.service.stprest.entities;
 
-import java.util.List;
 
-import org.springframework.data.annotation.Id;
+import com.fasterxml.jackson.annotation.JsonIgnore;
 
 import jakarta.persistence.Entity;
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.MapsId;
+import jakarta.persistence.OneToOne;
 
 @Entity
 public class Wallet {
-	
+
 	@Id
-	private int ID; //do we need it????
+	private String id;
 	private double cashAvailable;
-	private List<Transactions> historyOfTransactions;
-	public int getID() {
-		return ID;
+	private double buyingPower;
+
+	@OneToOne
+	@MapsId
+	@JoinColumn(name = "emailId")
+	@JsonIgnore
+	private User user;	
+
+	public double getBuyingPower() {
+		return buyingPower;
 	}
-	public void setID(int iD) {
-		ID = iD;
+
+	public void setBuyingPower(double buyingPower) {
+		this.buyingPower = buyingPower;
 	}
+
 	public double getCashAvailable() {
 		return cashAvailable;
 	}
+
 	public void setCashAvailable(double cashAvailable) {
 		this.cashAvailable = cashAvailable;
 	}
-	public List<Transactions> getHistoryOfTransactions() {
-		return historyOfTransactions;
-	}
-	public void setHistoryOfTransactions(List<Transactions> historyOfTransactions) {
-		this.historyOfTransactions = historyOfTransactions;
-	}
-	public Wallet(int iD, double cashAvailable, List<Transactions> historyOfTransactions) {
-		super();
-		ID = iD;
-		this.cashAvailable = cashAvailable;
-		this.historyOfTransactions = historyOfTransactions;
+
+	public String getId() {
+		return id;
 	}
 
+	public void setId(String id) {
+		this.id = id;
+	}
+
+	public User getUser() {
+		return user;
+	}
+
+	public void setUser(User user) {
+		this.user = user;
+	}
 
 }
