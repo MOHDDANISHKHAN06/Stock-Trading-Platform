@@ -10,4 +10,9 @@ public interface OrderService {
 
 	public void addOrder(Order order);
 	
+	public void cancelOrder(int orderId);
+
+	public List<Order> getOrders(String emailId);
+
+	public List<Order> getOrdersInProgress(String emailId);
 }

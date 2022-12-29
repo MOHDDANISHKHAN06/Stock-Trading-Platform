@@ -1,23 +1,47 @@
 package com.service.stprest.entities;
 
-import jakarta.persistence.EmbeddedId;
+import java.time.LocalDate;
+import java.util.Date;
+
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
+import jakarta.persistence.SequenceGenerator;
 import jakarta.persistence.Table;
 
 @Entity
 @Table(name = "orders")
 public class Order {
-
-	@EmbeddedId
-	private UserOrderId userOrderId;
+	
+	@Id
+	@SequenceGenerator(name="seq", allocationSize=100)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")    
+	private int orderId = 1;
 	private long limitValue;
-	//private Date expiry;
+	private LocalDate expiry;
 	private String orderType;
 	private String status;
 	private long numOfShares;
 	private String ticker;
+	
+	//do we need emailId, every user will have a email id , we can get it from there??
+	private String emailId;
+
+	public int getOrderId() {
+		return orderId;
+	}
+
+	public String getEmailId() {
+		return emailId;
+	}
+
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
 
 	public String getTicker() {
 		return ticker;
@@ -31,13 +55,6 @@ public class Order {
 	@MapsId("emailId")
 	private User user;
 
-	public UserOrderId getUserOrderId() {
-		return userOrderId;
-	}
-
-	public void setUserOrderId(UserOrderId userOrderId) {
-		this.userOrderId = userOrderId;
-	}
 
 	public long getNumOfShares() {
 		return numOfShares;
@@ -56,13 +73,14 @@ public class Order {
 		this.limitValue = limitValue;
 	}
 
-	//	public Date getExpiry() {
-	//		return expiry;
-	//	}
-	//
-	//	public void setExpiry(Date expiry) {
-	//		this.expiry = expiry;
-	//	}
+		public LocalDate getExpiry() {
+			return expiry;
+		}
+	
+		public void setExpiry(LocalDate expiry) {
+			
+			this.expiry = expiry;
+		}
 
 	public String getOrderType() {
 		return orderType;
@@ -87,7 +105,4 @@ public class Order {
 	public void setUser(User user) {
 		this.user = user;
 	}
-
-
-
 }

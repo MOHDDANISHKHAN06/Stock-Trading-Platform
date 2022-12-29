@@ -3,10 +3,12 @@ package com.service.stprest.helper;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.service.stprest.dao.TransactionDao;
 //import com.service.stprest.dao.TransactionDao;
 import com.service.stprest.dao.UserDao;
 import com.service.stprest.dao.WalletDao;
@@ -24,7 +26,7 @@ public class UserServiceImpl implements UserService {
 	@Autowired
 	private WalletDao walletDao;
 	@Autowired
-//	private TransactionDao transactionDao;
+	private TransactionDao transactionDao;
 	
 	@Override
 	public List<User> getUsers() {
@@ -60,8 +62,6 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Wallet getWallet(String emailId) {
-		//System.out.println(walletDao.findById(emailId).get());
-		//System.out.println("kjbckjjcjkdcc");
 		return walletDao.findById(emailId).get();
 	}
 	
@@ -74,12 +74,17 @@ public class UserServiceImpl implements UserService {
 		return wallet;
 		
 	}
+	
+	public Set<UserStocks> getUserStocks(String emailId){
+		Set<UserStocks> lists = userDao.findById(emailId).get().getStocks();
+		return lists;
+	}
 
 	@Override
 	public List<Transactions> getTransaction(String emailId) {
 		List<Transactions> lists = new ArrayList<>();
 		try {
-//			lists = transactionDao.findAll();
+			lists = transactionDao.findAllByEmailId(emailId);
 		} catch (Exception e) {
 			System.out.println("print");
 		}
@@ -88,24 +93,22 @@ public class UserServiceImpl implements UserService {
 
 	@Override
 	public Transactions updateTransaction(String emailId, Transactions transaction) {
-		
-		//deposit/withdraw
-		//updatewallet
-		//update transaction
 		Wallet wallet = walletDao.findById(emailId).get();
 		double userCash = wallet.getCashAvailable();
-		double transactionAmount = transaction.getTransacnAmt();
+		double transactionAmount = transaction.getTransactionAmount();
 		double userBuyingPower = wallet.getBuyingPower();
-		
-		double newCashAmount = (transaction.getTransacnType().equals("DEPOSIT"))? userCash + transactionAmount : userCash - transactionAmount;
-		
-		
-		wallet.setCashAvailable(newCashAmount);
-		
-		
-		return null;
+		if(transaction.getTransactionType().equals("DEPOSIT"))
+		{
+			userCash+=transactionAmount;
+			userBuyingPower+=transactionAmount;
+		}
+		else {
+			userCash-=transactionAmount;
+			userBuyingPower-=transactionAmount;	
+		}
+		wallet.setCashAvailable(userCash);
+		wallet.setBuyingPower(userBuyingPower);
+		transactionDao.save(transaction);
+		return transaction;
 	}
-
-
-	
 }

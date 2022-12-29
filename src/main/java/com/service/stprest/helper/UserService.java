@@ -1,9 +1,11 @@
 package com.service.stprest.helper;
 
 import java.util.List;
+import java.util.Set;
 
 import com.service.stprest.entities.Transactions;
 import com.service.stprest.entities.User;
+import com.service.stprest.entities.UserStocks;
 import com.service.stprest.entities.Wallet;
 
 
@@ -22,5 +24,7 @@ public interface UserService {
 	public List<Transactions> getTransaction(String emailId);
 
 	public Transactions updateTransaction(String emailId, Transactions transactions);
+
+	public Set<UserStocks> getUserStocks(String emailId);
 
 }

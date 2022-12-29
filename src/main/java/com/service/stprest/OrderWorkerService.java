@@ -1,8 +1,11 @@
 package com.service.stprest;
 
+import java.time.LocalDate;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.service.stprest.dao.OrderDao;
@@ -19,6 +22,7 @@ import com.service.stprest.helper.Util;
 
 @Component
 @Scope("prototype")
+@EnableTransactionManagement
 public class OrderWorkerService implements Runnable {
 	
 	@Autowired
@@ -38,19 +42,26 @@ public class OrderWorkerService implements Runnable {
 		while(true) {
 			Order order = Util.orderQueue.poll();
 			if(order != null) {
-				
-				//Date now = new Date();
-//				if(order.getExpiry().after(now))
-//				{
-//					order.setStatus("Order Expired");
-//					cancelOrder(order);
-//				}	
-				if(order.getOrderType().equals("BUY"))
-					buyStock(order);
-				else 
-					sellStock(order);
-				// check returned status and accordingly add to queue or change status
-
+				if(orderDao.findById(order.getOrderId()).get().getStatus().equals("Cancelled")){
+					continue;
+				}
+				if(order.getLimitValue() !=0 ){
+					double currentPrice = stockDao.findById(order.getTicker()).get().getCurrentPrice();
+					if(order.getOrderType().equals("BUY") && order.getLimitValue() > currentPrice )
+						Util.orderQueue.add(order);
+					if(order.getOrderType().equals("SELL") && order.getLimitValue() < currentPrice )
+						Util.orderQueue.add(order);
+					continue;
+				}
+				///Handling expired orders
+				LocalDate now = LocalDate.now();
+				if(order.getExpiry().isBefore(now))
+				{
+					order.setStatus("Order Expired");
+					orderDao.save(order);
+					continue;
+				}	
+				placeOrder(order);			
 			}	
 			try {
 				// sleep for 1 sec
@@ -61,43 +72,16 @@ public class OrderWorkerService implements Runnable {
 		}
 	}
 	
-	
-	public void cancelOrder(Order order)
-	{
-		//cancel limit-order if user wants to cancel it or it is expired; 
-		orderDao.save(order);
-	}
-	
-	public void buyStock(Order order)
-	{
-						
-		//Place order
-		placeOrder(order);
-		//return status
-
-	}
-	
-	public void sellStock(Order order)
-	{
-		//Place order
-		placeOrder(order);
-		//return status
-		
-	}
-	
 	@Transactional
 	public void placeOrder(Order order)
 	{
-		//update stocks
 		updateStocks(order);
-
-		//update wallet
-		updateWallet(order);
-		
-		//update user_stocks
+		updateWallet(order);		
 		updateUserStocks(order);
 		
 		//Place order
+		order.setUser(this.userService.getUser(order.getEmailId()));
+		order.setStatus("Order is Successfull");
 		orderDao.save(order);
 		
 		//if all successful proceed else revert back the changes and add order back to queue
@@ -108,19 +92,25 @@ public class OrderWorkerService implements Runnable {
 	{
 		Stock stock = stockDao.findById(order.getTicker()).get();
 		long companyVolume = stock.getVolume();
-		long newVolume = companyVolume + order.getNumOfShares();
+		long newVolume = (order.getOrderType().equals("BUY"))? companyVolume + order.getNumOfShares() : companyVolume - order.getNumOfShares();;
 		stock.setVolume(newVolume);
 		stockDao.save(stock);
 	}
 
 	public void updateWallet(Order order)
 	{
-		Wallet wallet = walletDao.findById(order.getUserOrderId().getEmailId()).get();
+		Wallet wallet = walletDao.findById(order.getEmailId()).get();
 		double cashAvailable = wallet.getCashAvailable();
 		double currentPrice = stockDao.findById(order.getTicker()).get().getCurrentPrice();
 		double totalOrderAmount = currentPrice * order.getNumOfShares();
-
-		double newCashAmount = (order.getOrderType().equals("BUY"))? cashAvailable - totalOrderAmount : cashAvailable + totalOrderAmount;
+		double newCashAmount;
+		if(order.getOrderType().equals("SELL")) {
+			 wallet.setBuyingPower(wallet.getBuyingPower() + totalOrderAmount);
+			 newCashAmount = cashAvailable + totalOrderAmount;
+		}
+		else {
+			  newCashAmount = cashAvailable - totalOrderAmount;
+		}
 		wallet.setCashAvailable(newCashAmount);
 		walletDao.save(wallet);
 	}
@@ -128,7 +118,7 @@ public class OrderWorkerService implements Runnable {
 	public void updateUserStocks(Order order)
 	{
 		UserStockId userStockId = new UserStockId();
-		userStockId.setEmailId(order.getUserOrderId().getEmailId());
+		userStockId.setEmailId(order.getEmailId());
 		userStockId.setTicker(order.getTicker());
 		long existingShares = 0;
 		UserStocks userStock;
@@ -138,7 +128,8 @@ public class OrderWorkerService implements Runnable {
 		}
 		else{
 			userStock = new UserStocks();
-			userStock.setUser(this.userService.getUser(order.getUserOrderId().getEmailId()));
+			userStock.setId(userStockId);
+			userStock.setUser(this.userService.getUser(order.getEmailId()));
 		}
 		
 		long newShares = order.getNumOfShares();			

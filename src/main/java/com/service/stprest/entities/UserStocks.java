@@ -1,9 +1,10 @@
 package com.service.stprest.entities;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnore;
+
 import jakarta.persistence.EmbeddedId;
 import jakarta.persistence.Entity;
-import jakarta.persistence.FetchType;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.MapsId;
 
@@ -16,11 +17,8 @@ public class UserStocks {
 
 	@ManyToOne
 	@MapsId("emailId")
+	@JsonIgnore
 	private User user;
-
-	@ManyToOne(fetch = FetchType.LAZY)
-	@MapsId("ticker")
-	private Stock stock;
 
 	private long numOfShares;
 
@@ -37,23 +35,7 @@ public class UserStocks {
 	}
 
 	public void setUser(User user) {
-		//		if(user != null) {
-		//			if(this.user!=null) {
-		//				this.user.setStocks(null);
-		//			} else {
-		//				this.user.setStocks(user.getStocks());
-		//			}
-		//			
-		//		}
 		this.user = user;
-	}
-
-	public Stock getStock() {
-		return stock;
-	}
-
-	public void setStock(Stock stock) {
-		this.stock = stock;
 	}
 
 	public long getNumOfShares() {

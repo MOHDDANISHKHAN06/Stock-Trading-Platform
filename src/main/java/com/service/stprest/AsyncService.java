@@ -5,8 +5,10 @@ import java.util.concurrent.ExecutorService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.EnableTransactionManagement;
 
 @Service
+@EnableTransactionManagement
 public class AsyncService {
 	
 	@Autowired

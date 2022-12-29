@@ -1,32 +1,41 @@
 package com.service.stprest.entities;
 
-//import java.sql.Time;
-//import java.util.Date;
-
 import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.GenerationType;
+import jakarta.persistence.Id;
+import jakarta.persistence.SequenceGenerator;
 
-//@Entity
+@Entity
 public class Transactions {
 	
-	private UserTransactionId userTransactionId;
+	@Id
+	@SequenceGenerator(name="seq", allocationSize=100)
+    @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")  
+    private int transactionId; 
+    private String emailId;
 	private String transactionType;
-	private double transactionAmt;
-	
+	private double transactionAmount;
 	//private Date date;
 	//private Time time;
 	
-	public UserTransactionId getUserTransactionId() {
-		return userTransactionId;
+	public int getTransactionId() {
+		return transactionId;
 	}
-	public void setUserTransactionId(UserTransactionId userTransactionId) {
-		this.userTransactionId = userTransactionId;
+	public String getEmailId() {
+		return emailId;
 	}
-
-	public String getTransacnType() {
+	public void setEmailId(String emailId) {
+		this.emailId = emailId;
+	}
+	public void setTransactionType(String transactionType) {
+		this.transactionType = transactionType;
+	}
+	public String getTransactionType() {
 		return transactionType;
 	}
-	public void setTransacnType(String transacnType) {
-		this.transactionType = transacnType;
+	public void setTransacnType(String transactionType) {
+		this.transactionType = transactionType;
 	}
 //	public Date getDate() {
 //		return date;
@@ -40,10 +49,10 @@ public class Transactions {
 //	public void setTime(Time time) {
 //		this.time = time;
 //	}
-	public double getTransacnAmt() {
-		return transactionAmt;
+	public double getTransactionAmount() {
+		return transactionAmount;
 	}
-	public void setTransacnAmt(double transacnAmt) {
-		this.transactionAmt = transacnAmt;
+	public void setTransactionAmount(double transactionAmount) {
+		this.transactionAmount = transactionAmount;
 	}	
 }
