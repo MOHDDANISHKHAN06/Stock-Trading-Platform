@@ -47,6 +47,9 @@ public class UserServiceImpl implements UserService {
 		wallet.setUser(user);
 		walletDao.save(wallet);
 		user.setWallet(wallet);
+		if(user.getFullName().equals("admin")){
+			user.setAdmin(true);
+		}
 		userDao.save(user);
 		return null;
 	}

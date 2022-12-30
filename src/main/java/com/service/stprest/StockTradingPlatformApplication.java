@@ -14,5 +14,5 @@ public class StockTradingPlatformApplication {
 		SpringApplication.run(StockTradingPlatformApplication.class, args);		 
 
 	}
-
+	
 }

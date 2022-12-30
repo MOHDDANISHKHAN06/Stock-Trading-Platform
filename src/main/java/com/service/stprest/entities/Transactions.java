@@ -1,5 +1,8 @@
 package com.service.stprest.entities;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
+
 import jakarta.persistence.Entity;
 import jakarta.persistence.GeneratedValue;
 import jakarta.persistence.GenerationType;
@@ -16,9 +19,21 @@ public class Transactions {
     private String emailId;
 	private String transactionType;
 	private double transactionAmount;
-	//private Date date;
-	//private Time time;
+	private LocalDate date;
+	private LocalTime time;
 	
+	public LocalDate getDate() {
+		return date;
+	}
+	public void setDate(LocalDate date) {
+		this.date = date;
+	}
+	public LocalTime getTime() {
+		return time;
+	}
+	public void setTime(LocalTime time) {
+		this.time = time;
+	}
 	public int getTransactionId() {
 		return transactionId;
 	}
@@ -37,18 +52,6 @@ public class Transactions {
 	public void setTransacnType(String transactionType) {
 		this.transactionType = transactionType;
 	}
-//	public Date getDate() {
-//		return date;
-//	}
-//	public void setDate(Date date) {
-//		this.date = date;
-//	}
-//	public Time getTime() {
-//		return time;
-//	}
-//	public void setTime(Time time) {
-//		this.time = time;
-//	}
 	public double getTransactionAmount() {
 		return transactionAmount;
 	}
