@@ -16,6 +16,6 @@ public class ThreadConfig {
 	@Bean
     public ExecutorService threadPoolTaskExecutor() {
 
-        return new ThreadPoolExecutor(1, 1, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
+        return new ThreadPoolExecutor(10, 10, 0L, TimeUnit.MILLISECONDS, new LinkedBlockingQueue<Runnable>());
     }
 }

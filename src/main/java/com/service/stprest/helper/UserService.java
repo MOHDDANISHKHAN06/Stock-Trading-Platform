@@ -15,7 +15,7 @@ public interface UserService {
 	
 	public List<User> getUsers();
 
-	public User addUser(User user);
+//	public User addUser(User user);
 
 	public Wallet getWallet(String emailId);
 

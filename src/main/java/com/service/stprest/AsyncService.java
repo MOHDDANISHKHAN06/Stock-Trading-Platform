@@ -21,6 +21,10 @@ public class AsyncService {
 
     	OrderWorkerService myThread = applicationContext.getBean(OrderWorkerService.class);
         taskExecutor.execute(myThread);
+        
+        RandomStockPriceGenerartorService mythread2 =  applicationContext.getBean(RandomStockPriceGenerartorService.class);
+    	taskExecutor.execute(mythread2);  
+              
     }
 
 }

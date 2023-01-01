@@ -40,21 +40,6 @@ public class UserServiceImpl implements UserService {
 	}
 
 	@Override
-	public User addUser(User user) {
-		Wallet wallet = new Wallet();		
-		wallet.setBuyingPower(0);
-		wallet.setCashAvailable(0);
-		wallet.setUser(user);
-		walletDao.save(wallet);
-		user.setWallet(wallet);
-		if(user.getFullName().equals("admin")){
-			user.setAdmin(true);
-		}
-		userDao.save(user);
-		return null;
-	}
-
-	@Override
 	public User getUser(String emailId) {
 		Optional<User> user = userDao.findById(emailId);
 		if(user.isPresent()) {
@@ -106,8 +91,14 @@ public class UserServiceImpl implements UserService {
 			userBuyingPower+=transactionAmount;
 		}
 		else {
-			userCash-=transactionAmount;
-			userBuyingPower-=transactionAmount;	
+			if(transactionAmount<=userBuyingPower)
+			{
+				userCash-=transactionAmount;
+				userBuyingPower-=transactionAmount;	
+			}
+			else {
+				throw new RuntimeException("Amount requested to withdraw is Invalid");
+			}
 		}
 		wallet.setCashAvailable(userCash);
 		wallet.setBuyingPower(userBuyingPower);

@@ -19,7 +19,7 @@ public class Order {
 	@Id
 	@SequenceGenerator(name="seq", allocationSize=100)
     @GeneratedValue(strategy=GenerationType.SEQUENCE, generator="seq")    
-	private int orderId = 1;
+	private int orderId; /////change it but how?
 	private long limitValue;
 	private LocalDate expiry;
 	private String orderType;

@@ -8,9 +8,11 @@ import org.springframework.stereotype.Service;
 
 import com.service.stprest.dao.OrderDao;
 import com.service.stprest.dao.StockDao;
+import com.service.stprest.dao.UserStockDao;
 import com.service.stprest.dao.WalletDao;
 import com.service.stprest.entities.Order;
 import com.service.stprest.entities.Transactions;
+import com.service.stprest.entities.UserStockId;
 import com.service.stprest.entities.Wallet;
 
 
@@ -24,6 +26,8 @@ public class OrderServiceImpl implements OrderService{
 	private StockDao stockDao;
 	@Autowired
 	private WalletDao walletDao;
+	@Autowired
+	private UserStockDao userStockDao;
 	
 	@Override
 	public List<Order> getorders() {
@@ -35,11 +39,32 @@ public class OrderServiceImpl implements OrderService{
 		double buyingPower = walletDao.getReferenceById(order.getEmailId()).getBuyingPower();
 		if(order.getOrderType().equals("SELL"))
 		{
-			order.setStatus("In Progress");
-			orderDao.save(order);
-			Util.orderQueue.add(order);	
+			UserStockId userStockId = new UserStockId();
+			userStockId.setEmailId(order.getEmailId());
+			userStockId.setTicker(order.getTicker());
+			long existingShares = userStockDao.findById(userStockId).get().getNumOfShares();
+			if(existingShares >= order.getNumOfShares())
+			{
+				order.setStatus("In Progress");
+				orderDao.save(order);
+				Util.orderQueue.add(order);	
+			}
+			else {
+				order.setStatus("Invalid Sell");
+				orderDao.save(order);
+				throw new RuntimeException("Number of shares requested to sell is Invalid");
+			}
 		}
 		else{
+			long volume = stockDao.findById(order.getTicker()).get().getVolume();
+			double mktcapitlisation = stockDao.findById(order.getTicker()).get().getMarketCapitalisation();
+			
+			if(mktcapitlisation-volume < order.getNumOfShares())
+			{
+				order.setStatus("Invalid Buy");
+				orderDao.save(order);
+				throw new RuntimeException("Number of shares requested to buy is Invalid");
+			}
 			if(orderValue <= buyingPower ){
 				buyingPower-=orderValue;
 				Wallet wallet = walletDao.findById(order.getEmailId()).get();
@@ -49,9 +74,9 @@ public class OrderServiceImpl implements OrderService{
 				orderDao.save(order);
 				Util.orderQueue.add(order);				
 			}
-		else {
-			throw new RuntimeException("Order value is greater than buying power");
-			}
+			else {
+				throw new RuntimeException("Order value is greater than buying power");
+				}
 		}
 	}
 	@Override

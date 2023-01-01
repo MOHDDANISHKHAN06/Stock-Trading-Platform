@@ -1,6 +1,6 @@
 package com.service.stprest;
 
-
+import java.util.regex.Pattern;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpMethod;
@@ -33,9 +33,11 @@ public class SecurityConfig {
 
         http.addFilterBefore(new CorsFilter(), ChannelProcessingFilter.class).csrf().disable()
                 .authorizeHttpRequests((authorize) ->
-                		//authorize.anyRequest().authenticated()
-                        authorize.requestMatchers(HttpMethod.GET, "/api/**").permitAll()
+                        authorize.requestMatchers(HttpMethod.GET, "/api/stocks/**").permitAll()
+                        		.requestMatchers(HttpMethod.GET, "/api/users/**").permitAll()
                                 .requestMatchers("/api/auth/**").permitAll()
+                                .requestMatchers(HttpMethod.GET , "/api/users").hasAnyAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/stocks").hasAnyAuthority("ADMIN")
                                 .anyRequest().authenticated()
 
                 ).httpBasic();

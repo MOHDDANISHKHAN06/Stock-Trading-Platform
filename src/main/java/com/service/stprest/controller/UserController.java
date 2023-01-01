@@ -41,19 +41,14 @@ public class UserController {
 		return this.userService.getUser(emailId);
 	}
 
-	@PostMapping("/users")
-	public User adduser(@RequestBody User user) {
-		return this.userService.addUser(user);
-	}
-
 	@PostMapping("/users/{emailId}/order")
 	public void placeOrder(@PathVariable String emailId, @RequestBody Order order) {
 		this.orderService.addOrder(order);
 	}
 	
-	@PostMapping("/users/{emailId}/cancel/{orderId}")
-	public void cancelOrder(@PathVariable int orderId) {
-		this.orderService.cancelOrder(orderId);
+	@PostMapping("/users/{emailId}/cancel")
+	public void cancelOrder(@RequestBody Order order) {
+		this.orderService.cancelOrder(order.getOrderId());
 	}
 
 	@GetMapping("/users/{emailId}/orders")

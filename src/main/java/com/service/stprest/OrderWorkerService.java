@@ -40,34 +40,44 @@ public class OrderWorkerService implements Runnable {
 	public void run() {
 		// long running back end service
 		while(true) {
-			Order order = Util.orderQueue.poll();
-			if(order != null) {
-				if(orderDao.findById(order.getOrderId()).get().getStatus().equals("Cancelled")){
-					continue;
-				}
-				if(order.getLimitValue() !=0 ){
-					double currentPrice = stockDao.findById(order.getTicker()).get().getCurrentPrice();
-					if(order.getOrderType().equals("BUY") && order.getLimitValue() > currentPrice )
-						Util.orderQueue.add(order);
-					if(order.getOrderType().equals("SELL") && order.getLimitValue() < currentPrice )
-						Util.orderQueue.add(order);
-					continue;
-				}
-				///Handling expired orders
-				LocalDate now = LocalDate.now();
-				if(order.getExpiry().isBefore(now))
-				{
-					order.setStatus("Order Expired");
-					orderDao.save(order);
-					continue;
+			synchronized (orderDao) {
+				System.out.println("orderId");
+				Order order = Util.orderQueue.poll();
+				if(order != null) {
+					
+					if(orderDao.findById(order.getOrderId()).get().getStatus().equals("Cancelled")){
+						continue;
+					}
+					if(order.getLimitValue()!=0 ){
+						double currentPrice = stockDao.findById(order.getTicker()).get().getCurrentPrice();
+						if(order.getOrderType().equals("BUY") && order.getLimitValue() < currentPrice ) {
+							Util.orderQueue.add(order);
+							continue;
+						}
+						if(order.getOrderType().equals("SELL") && order.getLimitValue() > currentPrice ) {
+							Util.orderQueue.add(order);
+							continue;
+						}
+					}
+					///Handling expired orders'
+					if (order.getExpiry()!= null) {
+						LocalDate now = LocalDate.now();
+						System.out.println(now);
+						if(order.getExpiry().isBefore(now))
+						{
+							order.setStatus("Order Expired");
+							orderDao.save(order);
+							continue;
+						}
+					}	
+					placeOrder(order);			
 				}	
-				placeOrder(order);			
-			}	
-			try {
-				// sleep for 1 sec
-				Thread.sleep(1000);
-			} catch (InterruptedException e) {
-				e.printStackTrace();
+				try {
+					// sleep for 1 sec
+					Thread.sleep(1000);
+				} catch (InterruptedException e) {
+					e.printStackTrace();
+				}
 			}
 		}
 	}
@@ -81,11 +91,9 @@ public class OrderWorkerService implements Runnable {
 		
 		//Place order
 		order.setUser(this.userService.getUser(order.getEmailId()));
-		order.setStatus("Order is Successfull");
+		order.setStatus("Completed");
+		System.out.print(order.getOrderId());
 		orderDao.save(order);
-		
-		//if all successful proceed else revert back the changes and add order back to queue
-		//return status
 	}
 	
 	public void updateStocks(Order order)

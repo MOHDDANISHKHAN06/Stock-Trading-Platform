@@ -12,7 +12,7 @@ public class Stock {
 	private double initialPrice;
 	private double currentPrice;
 	private long volume;
-	private double dayhigh;
+	private double dayHigh;
 	private double dayLow;
 	private double marketCapitalisation;
 	
@@ -32,11 +32,11 @@ public class Stock {
 	public void setCurrentPrice(double currentPrice) {
 		this.currentPrice = currentPrice;
 	}
-	public double getDayhigh() {
-		return dayhigh;
+	public double getDayHigh() {
+		return dayHigh;
 	}
-	public void setDayhigh(double dayhigh) {
-		this.dayhigh = dayhigh;
+	public void setDayHigh(double dayHigh) {
+		this.dayHigh = dayHigh;
 	}
 	public double getDayLow() {
 		return dayLow;
