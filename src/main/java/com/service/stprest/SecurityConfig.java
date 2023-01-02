@@ -38,6 +38,7 @@ public class SecurityConfig {
                                 .requestMatchers("/api/auth/**").permitAll()
                                 .requestMatchers(HttpMethod.GET , "/api/users").hasAnyAuthority("ADMIN")
                                 .requestMatchers(HttpMethod.POST, "/api/stocks").hasAnyAuthority("ADMIN")
+                                .requestMatchers(HttpMethod.POST, "/api/market/addHoliday").hasAnyAuthority("ADMIN")
                                 .anyRequest().authenticated()
 
                 ).httpBasic();

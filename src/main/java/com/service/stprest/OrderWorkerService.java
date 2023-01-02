@@ -1,6 +1,7 @@
 package com.service.stprest;
 
 import java.time.LocalDate;
+import java.time.LocalTime;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
@@ -8,15 +9,18 @@ import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.service.stprest.dao.MarketScheduleDao;
 import com.service.stprest.dao.OrderDao;
 import com.service.stprest.dao.StockDao;
 import com.service.stprest.dao.UserStockDao;
 import com.service.stprest.dao.WalletDao;
+import com.service.stprest.entities.MarketSchedule;
 import com.service.stprest.entities.Order;
 import com.service.stprest.entities.Stock;
 import com.service.stprest.entities.UserStockId;
 import com.service.stprest.entities.UserStocks;
 import com.service.stprest.entities.Wallet;
+import com.service.stprest.helper.MarketUtil;
 import com.service.stprest.helper.UserService;
 import com.service.stprest.helper.Util;
 
@@ -34,6 +38,8 @@ public class OrderWorkerService implements Runnable {
 	@Autowired
 	private OrderDao orderDao;
 	@Autowired
+	private MarketScheduleDao marketScheduleDao;
+	@Autowired
 	UserService userService;
 	
 	@Override
@@ -41,14 +47,35 @@ public class OrderWorkerService implements Runnable {
 		// long running back end service
 		while(true) {
 			synchronized (orderDao) {
-				System.out.println("orderId");
 				Order order = Util.orderQueue.poll();
 				if(order != null) {
-					
+						
 					if(orderDao.findById(order.getOrderId()).get().getStatus().equals("Cancelled")){
 						continue;
 					}
-					if(order.getLimitValue()!=0 ){
+					
+					///Handling expired orders'
+					if (order.getExpiry()!= null && MarketUtil.isExpired(order)) {
+						order.setStatus("Order Expired");
+						orderDao.save(order);
+						continue;
+					}
+					
+					MarketSchedule marketSchedule = marketScheduleDao.findById(1).get();
+					
+					// Check if order is in market hours or not before executing it
+					if(!MarketUtil.isValidMarketHour(marketSchedule.getHolidays(), marketSchedule.getStartTime(), marketSchedule.getEndTime(), LocalDate.now(), LocalTime.now())) {
+						Util.orderQueue.add(order);
+						try {
+							// sleep for 1 sec
+							Thread.sleep(1000);
+						} catch (InterruptedException e) {
+							e.printStackTrace();
+						}
+						continue;
+					}
+					
+					if(order.getLimitValue()!=0){
 						double currentPrice = stockDao.findById(order.getTicker()).get().getCurrentPrice();
 						if(order.getOrderType().equals("BUY") && order.getLimitValue() < currentPrice ) {
 							Util.orderQueue.add(order);
@@ -59,17 +86,7 @@ public class OrderWorkerService implements Runnable {
 							continue;
 						}
 					}
-					///Handling expired orders'
-					if (order.getExpiry()!= null) {
-						LocalDate now = LocalDate.now();
-						System.out.println(now);
-						if(order.getExpiry().isBefore(now))
-						{
-							order.setStatus("Order Expired");
-							orderDao.save(order);
-							continue;
-						}
-					}	
+						
 					placeOrder(order);			
 				}	
 				try {
@@ -81,6 +98,7 @@ public class OrderWorkerService implements Runnable {
 			}
 		}
 	}
+	
 	
 	@Transactional
 	public void placeOrder(Order order)

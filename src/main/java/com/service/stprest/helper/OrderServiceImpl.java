@@ -1,15 +1,19 @@
 package com.service.stprest.helper;
 
+import java.time.LocalDate;
+import java.time.LocalTime;
 import java.util.ArrayList;
 import java.util.List;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import com.service.stprest.dao.MarketScheduleDao;
 import com.service.stprest.dao.OrderDao;
 import com.service.stprest.dao.StockDao;
 import com.service.stprest.dao.UserStockDao;
 import com.service.stprest.dao.WalletDao;
+import com.service.stprest.entities.MarketSchedule;
 import com.service.stprest.entities.Order;
 import com.service.stprest.entities.Transactions;
 import com.service.stprest.entities.UserStockId;
@@ -28,6 +32,8 @@ public class OrderServiceImpl implements OrderService{
 	private WalletDao walletDao;
 	@Autowired
 	private UserStockDao userStockDao;
+	@Autowired
+	private MarketScheduleDao marketScheduleDao;
 	
 	@Override
 	public List<Order> getorders() {
@@ -35,6 +41,13 @@ public class OrderServiceImpl implements OrderService{
 	}
 	@Override
 	public void addOrder(Order order) {
+		
+		MarketSchedule marketSchedule = marketScheduleDao.findById(1).get();
+		// Check if order is in market hours before executing it
+		if(!MarketUtil.isValidMarketHour(marketSchedule.getHolidays(), marketSchedule.getStartTime(), marketSchedule.getEndTime(), LocalDate.now(), LocalTime.now())) {
+			throw new RuntimeException("Order cannot be placed right now: market is closed ");
+		}
+		
 		double orderValue = order.getNumOfShares() * stockDao.getReferenceById(order.getTicker()).getCurrentPrice();
 		double buyingPower = walletDao.getReferenceById(order.getEmailId()).getBuyingPower();
 		if(order.getOrderType().equals("SELL"))

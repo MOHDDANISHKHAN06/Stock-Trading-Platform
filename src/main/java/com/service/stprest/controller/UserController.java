@@ -1,5 +1,6 @@
 package com.service.stprest.controller;
 
+import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -12,11 +13,13 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.service.stprest.entities.MarketSchedule;
 import com.service.stprest.entities.Order;
 import com.service.stprest.entities.Transactions;
 import com.service.stprest.entities.User;
 import com.service.stprest.entities.UserStocks;
 import com.service.stprest.entities.Wallet;
+import com.service.stprest.helper.MarketScheduleService;
 import com.service.stprest.helper.OrderService;
 import com.service.stprest.helper.UserService;
 
@@ -29,7 +32,9 @@ public class UserController {
 	@Autowired
 	UserService userService;
 	@Autowired
-	OrderService orderService;	
+	OrderService orderService;
+	@Autowired
+	MarketScheduleService marketScheduleService;
 
 	@GetMapping("/users")
 	public List<User> getUsers(){
@@ -85,4 +90,19 @@ public class UserController {
 	public Set<UserStocks> getstocks(@PathVariable String emailId){
 		return this.userService.getUserStocks(emailId);
 	}
+	
+	@PostMapping("/market/changemarkethours")
+	public void changeMarkethours(@RequestBody MarketSchedule marketHours){
+		this.marketScheduleService.changeMarketHours(marketHours.getStartTime(), marketHours.getEndTime());
+	}
+	
+	@PostMapping("/market/addHoliday")
+	public void addHoliday(@RequestBody MarketSchedule mktSchedule){
+		this.marketScheduleService.addHoliday(mktSchedule);
+	}
+	@GetMapping("/marketschedule")
+	public MarketSchedule marketSchedule(){
+		return this.marketScheduleService.getMarketSchedule(1);
+	}
+	
 }
