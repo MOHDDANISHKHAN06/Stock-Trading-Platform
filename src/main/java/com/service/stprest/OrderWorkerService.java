@@ -120,6 +120,7 @@ public class OrderWorkerService implements Runnable {
 		long companyVolume = stock.getVolume();
 		long newVolume = (order.getOrderType().equals("BUY"))? companyVolume + order.getNumOfShares() : companyVolume - order.getNumOfShares();;
 		stock.setVolume(newVolume);
+		stock.setMarketCapitalisation(newVolume*stock.getCurrentPrice());
 		stockDao.save(stock);
 	}
 

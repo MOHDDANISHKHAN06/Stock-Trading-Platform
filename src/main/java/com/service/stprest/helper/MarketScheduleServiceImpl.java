@@ -51,4 +51,23 @@ public class MarketScheduleServiceImpl implements MarketScheduleService{
 	public MarketSchedule getMarketSchedule(int Id) {
 				return marketScheduleDao.findById(Id).get();
 	}
+
+//	@Override
+//	public void deleteHoliday(MarketSchedule mktSchedule) {
+//		
+//		MarketSchedule marketSchedule;
+//		marketSchedule = marketScheduleDao.findById(1).get();
+//		
+//		String[] holidays = marketSchedule.getHolidays().split(",");
+//		String newHolidays = "";
+//		for(String s : holidays)
+//		{
+//			if(s.equals(mktSchedule.getHolidays())) {
+//				continue;
+//			}
+//			newHolidays= newHolidays + "," + s;
+//		}
+//		marketSchedule.setHolidays(newHolidays);
+//		marketScheduleDao.save(marketSchedule);
+//	}
 }

@@ -1,6 +1,5 @@
 package com.service.stprest.controller;
 
-import java.time.LocalDate;
 import java.util.List;
 import java.util.Set;
 
@@ -104,5 +103,8 @@ public class UserController {
 	public MarketSchedule marketSchedule(){
 		return this.marketScheduleService.getMarketSchedule(1);
 	}
-	
+//	@PostMapping("/market/deleteHoliday")
+//	public void deleteHoliday(@RequestBody MarketSchedule mktSchedule){
+//		this.marketScheduleService.deleteHoliday(mktSchedule);
+//	}
 }

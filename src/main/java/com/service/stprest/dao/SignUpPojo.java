@@ -2,16 +2,16 @@ package com.service.stprest.dao;
 
 
 public class SignUpPojo {
-    private String name;
+    private String fullName;
     private String userName;
     private String emailId;
     private String password;
     
-	public String getName() {
-		return name;
+	public String getFullName() {
+		return fullName;
 	}
-	public void setName(String name) {
-		this.name = name;
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 	public String getUserName() {
 		return userName;

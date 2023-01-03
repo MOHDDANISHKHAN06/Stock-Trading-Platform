@@ -69,15 +69,15 @@ public class OrderServiceImpl implements OrderService{
 			}
 		}
 		else{
-			long volume = stockDao.findById(order.getTicker()).get().getVolume();
-			double mktcapitlisation = stockDao.findById(order.getTicker()).get().getMarketCapitalisation();
-			
-			if(mktcapitlisation-volume < order.getNumOfShares())
-			{
-				order.setStatus("Invalid Buy");
-				orderDao.save(order);
-				throw new RuntimeException("Number of shares requested to buy is Invalid");
-			}
+//			long volume = stockDao.findById(order.getTicker()).get().getVolume();
+//			double mktcapitlisation = stockDao.findById(order.getTicker()).get().getMarketCapitalisation();
+//			
+//			if(mktcapitlisation-volume < order.getNumOfShares())
+//			{
+//				order.setStatus("Invalid Buy");
+//				orderDao.save(order);
+//				throw new RuntimeException("Number of shares requested to buy is Invalid");
+//			}
 			if(orderValue <= buyingPower ){
 				buyingPower-=orderValue;
 				Wallet wallet = walletDao.findById(order.getEmailId()).get();
@@ -95,6 +95,10 @@ public class OrderServiceImpl implements OrderService{
 	@Override
 	public void cancelOrder(int orderId) {
 		Order order = orderDao.findById(orderId).get();
+		Wallet wallet = walletDao.findById(order.getEmailId()).get();
+		double orderValue = order.getNumOfShares() * stockDao.getReferenceById(order.getTicker()).getCurrentPrice();
+		wallet.setBuyingPower(wallet.getBuyingPower() + orderValue);
+		walletDao.save(wallet);
 		order.setStatus("Cancelled");
 		orderDao.save(order);
 	}

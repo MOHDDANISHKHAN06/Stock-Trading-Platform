@@ -69,7 +69,7 @@ public class AuthController {
 
         // create user object
         User user = new User();
-        user.setfullName(signUpPojo.getName());
+        user.setFullName(signUpPojo.getFullName());
         user.setUserName(signUpPojo.getUserName());
         user.setEmailId(signUpPojo.getEmailId());
         user.setPassword(passwordEncoder.encode(signUpPojo.getPassword()));

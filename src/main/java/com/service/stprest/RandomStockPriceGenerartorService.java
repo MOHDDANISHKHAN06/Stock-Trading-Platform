@@ -15,7 +15,6 @@ import com.service.stprest.dao.StockDao;
 import com.service.stprest.entities.MarketSchedule;
 import com.service.stprest.entities.Stock;
 import com.service.stprest.helper.MarketUtil;
-import com.service.stprest.helper.Util;
 
 @Component
 @Scope("prototype")
@@ -32,31 +31,35 @@ public class RandomStockPriceGenerartorService implements Runnable {
 	public void run() {
 
 		while(true){
+			MarketSchedule marketSchedule;
 			
 			if(!marketScheduleDao.existsById(1)) {
-				MarketSchedule marketSchedule = new MarketSchedule();
+				marketSchedule = new MarketSchedule();
 				marketScheduleDao.save(marketSchedule);
 			}
-
+			marketSchedule = marketScheduleDao.findById(1).get();
 			
-			if(marketScheduleDao.existsById(1))
-			{
-				MarketSchedule marketSchedule = marketScheduleDao.findById(1).get();
-				// Check if order is in market hours before executing it
-				if(!MarketUtil.isValidMarketHour(marketSchedule.getHolidays(), marketSchedule.getStartTime(), marketSchedule.getEndTime(), LocalDate.now(), LocalTime.now())) {
-					try {
-						Thread.sleep(15 * 60 * 1000 );
-					} catch (InterruptedException e) {
-						e.printStackTrace();
-					}
-					continue;
+			// Check if order is in market hours before executing it
+			if(!MarketUtil.isValidMarketHour(marketSchedule.getHolidays(), marketSchedule.getStartTime(), marketSchedule.getEndTime(), LocalDate.now(), LocalTime.now())) {
+				try {
+					Thread.sleep(15 * 60 * 1000 );
+				} catch (InterruptedException e) {
+					e.printStackTrace();
 				}
-				
-				
+				continue;
 			}
 				
 			List<Stock> stockList = stockdao.findAll();
 			for(Stock stock : stockList) {
+				
+				LocalTime currentTime = LocalTime.now();
+				marketSchedule = marketScheduleDao.findById(1).get();
+				
+				//Updating opening price when market opens
+				if(currentTime.equals(marketSchedule.getStartTime())) {
+					stock.setInitialPrice(stock.getCurrentPrice());
+				}
+
 				double random = (Math.random() * 49) + 1;
 				System.out.println(random);
 				if(stock !=null)
@@ -68,6 +71,7 @@ public class RandomStockPriceGenerartorService implements Runnable {
 					if(newPrice > stock.getDayHigh()) stock.setDayHigh(newPrice);
 					if (newPrice < stock.getDayLow()) stock.setDayLow(newPrice);
 					stock.setCurrentPrice(newPrice);
+					stock.setMarketCapitalisation(newPrice*stock.getVolume());
 					stockdao.save(stock);
 				}
 			}

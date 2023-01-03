@@ -11,4 +11,7 @@ public interface MarketScheduleService {
 	public void addHoliday(MarketSchedule mktSchedule);
 	
 	public MarketSchedule getMarketSchedule(int Id);
+	
+	//public void deleteHoliday(MarketSchedule mktSchedule);
+
 }

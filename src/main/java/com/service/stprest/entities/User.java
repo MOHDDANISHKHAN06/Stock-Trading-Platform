@@ -73,11 +73,11 @@ public class User {
 		this.password = password;
 	}
 
-	public String getfullName() {
+	public String getFullName() {
 		return fullName;
 	}
 
-	public void setfullName(String fullName) {
+	public void setFullName(String fullName) {
 		this.fullName = fullName;
 	}
 
