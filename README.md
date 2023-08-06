@@ -1,8 +1,4 @@
 # Stock-Trading-Platform
-
-**Mohammad Danish Khan**  
-+1 623 206 4534 | mkhan118@asu.edu | [LinkedIn: danishkhan0609](https://www.linkedin.com/in/danishkhan0609) | [GitHub: MOHDDANISHKHAN06](https://github.com/MOHDDANISHKHAN06)
-
 **Stock Trading Platform Development**
 
 In a bid to cater to the ever-growing demands of modern stock trading, I undertook the development of a comprehensive stock trading platform, fulfilling a dual role of ensuring both customer interaction and administrative control. The platform was meticulously crafted with Java Spring Boot as the backbone, ensuring robustness and scalability in the backend operations.
