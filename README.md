@@ -14,3 +14,42 @@ Addressing the project's need for real-time price fluctuations, a custom random 
 The platform was architected in a Client/Server model where the ReactJS web application epitomized the client, communicating with the backend APIs on the server. This design ensured the system was primed to handle multiple clients concurrently, embodying the bustling nature of stock markets.
 
 In summary, this project was a testament to my proficiency in harnessing Java Spring Boot, MySQL, and ReactJS to deliver a holistic stock trading platform, marrying user demands with administrative controls, all while ensuring concurrency and real-time responsiveness.
+
+
+Client URL for GitHub: https://github.com/MOHDDANISHKHAN06/StockTradingPlatformClient 
+Server URL for GitHub: https://github.com/MOHDDANISHKHAN06/Stock-Trading-Platform
+
+Setting up Database:
+●	Install MySQL: While installing create a user to access mysql in the terminal.
+
+mysql -u root -p
+
+●	Create a database which you will use for your project
+
+Setting up server: Make sure Java is installed and environment variables are set up properly:
+
+brew install maven
+
+git clone https://github.com/MOHDDANISHKHAN06/Stock-Trading-Platform.git
+
+●	Modify the following details in application.properties file:
+#database configuration:mysql
+->spring.datasource.url=jdbc:mysql://localhost/StockTradingPlatform(Database Name)
+->spring.datasource.username=sql username
+->spring.datasource.password=password
+->spring.datasource.driver-class-name=com.mysql.cj.jdbc.Driver
+#Hibernate configuration
+->spring.jpa.hibernate.ddl-auto=update
+->spring.jpa.show-sql=true
+
+Cd Stock-Trading-Platform
+sudo mvn spring-boot:run
+
+
+Setting up client: Install npm and the follow following steps on terminal
+
+git clone https://github.com/MOHDDANISHKHAN06/StockTradingPlatformClient.git
+Cd StockTradingPlatformClient
+Npm install
+Npm run build
+Npm start
