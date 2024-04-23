@@ -17,6 +17,7 @@ In summary, this project was a testament to my proficiency in harnessing Java Sp
 
 
 Client URL for GitHub: https://github.com/MOHDDANISHKHAN06/StockTradingPlatformClient 
+
 Server URL for GitHub: https://github.com/MOHDDANISHKHAN06/Stock-Trading-Platform
 
 Setting up Database:
